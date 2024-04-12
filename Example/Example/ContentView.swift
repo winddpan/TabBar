@@ -51,7 +51,10 @@ struct ContentView: View {
     @State var count: Int = 0
 
     var body: some View {
-        body1
+        HStack {
+            body1
+            body2
+        }
     }
 
     @ViewBuilder
@@ -69,22 +72,24 @@ struct ContentView: View {
                 }
             }
             .tabItem {
-                Text("1")
+                Image(systemName: Item.first.icon)
+                Text(Item.first.title)
             }
 
             NavigationStack {
-                NavigationLink {
-                    Text("123")
-                        .navigationTitle("123")
-                } label: {
-                    Color.red.overlay {
-                        Text("subview")
-                    }
-                    .navigationTitle("root")
-                }
+                TextWrapper()
             }
             .tabItem {
-                Text("2")
+                Image(systemName: Item.second.icon)
+                Text(Item.second.title)
+            }
+
+            NavigationStack {
+                TextWrapper()
+            }
+            .tabItem {
+                Image(systemName: Item.third.icon)
+                Text(Item.third.title)
             }
         }
     }
