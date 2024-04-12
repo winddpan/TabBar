@@ -27,6 +27,9 @@ import SwiftUI
 class TabBarSelection<TabItem: Tabbable>: ObservableObject {
     private var cancelSet = Set<AnyCancellable>()
 
+    var tabItemStyle: AnyTabItemStyle = .init(itemStyle: DefaultTabItemStyle())
+    var tabBarStyle: AnyTabBarStyle = .init(barStyle: DefaultTabBarStyle())
+
     @Published var selection: TabItem {
         didSet {
             loadedItems.insert(selection)

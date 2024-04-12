@@ -48,10 +48,8 @@ public struct TabBar<TabItem: Tabbable, Content: View>: View {
     @StateObject private var selectedItem: TabBarSelection<TabItem>
     private let content: () -> Content
 
-    private var tabItemStyle: AnyTabItemStyle
-    private var tabBarStyle: AnyTabBarStyle
-
-    @Binding private var visibility: TabBarVisibility
+    private var tabItemStyle: AnyTabItemStyle = .init(itemStyle: DefaultTabItemStyle())
+    private var tabBarStyle: AnyTabBarStyle = .init(barStyle: DefaultTabBarStyle())
 
     /**
      Creates a tab bar components with given
@@ -63,51 +61,22 @@ public struct TabBar<TabItem: Tabbable, Content: View>: View {
      */
     public init(
         selection: Binding<TabItem>,
-        visibility: Binding<TabBarVisibility> = .constant(.visible),
         @ViewBuilder content: @escaping () -> Content
     ) {
-        tabItemStyle = .init(itemStyle: DefaultTabItemStyle())
-        tabBarStyle = .init(barStyle: DefaultTabBarStyle())
-
         _selectedItem = .init(wrappedValue: .init(selection: selection))
         self.content = content
-        _visibility = visibility
-    }
-
-    private var tabItems: some View {
-        HStack {
-            ForEach(selectedItem.items, id: \.self) { item in
-                tabItemStyle.tabItem(
-                    icon: item.icon,
-                    selectedIcon: item.selectedIcon,
-                    title: item.title,
-                    isSelected: selectedItem.selection == item
-                )
-                .onTapGesture {
-                    selectedItem.selection = item
-                }
-            }
-            .frame(maxWidth: .infinity)
-        }
     }
 
     public var body: some View {
+        let _ = {
+            selectedItem.tabItemStyle = tabItemStyle
+            selectedItem.tabBarStyle = tabBarStyle
+        }()
+
         ZStack {
             content()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .environmentObject(selectedItem)
-
-            GeometryReader { geometry in
-                VStack {
-                    Spacer()
-
-                    tabBarStyle.tabBar(with: geometry) {
-                        .init(tabItems)
-                    }
-                }
-                .edgesIgnoringSafeArea(.bottom)
-                .visibility(visibility)
-            }
         }
         .onPreferenceChange(TabBarPreferenceKey.self) { value in
             if value != selectedItem.items {

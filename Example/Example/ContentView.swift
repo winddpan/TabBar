@@ -48,16 +48,72 @@ struct ContentView: View {
     }
 
     @State private var selection: Item = .first
-    @State private var visibility: TabBarVisibility = .visible
+    @State var count: Int = 0
 
     var body: some View {
-        TabBar(selection: $selection, visibility: $visibility) {
-            Button {
-                withAnimation {
-                    visibility.toggle()
+        body1
+    }
+
+    @ViewBuilder
+    var body2: some View {
+        TabView(selection: $selection) {
+            NavigationStack {
+                NavigationLink {
+                    Text("123")
+                        .navigationTitle("123")
+                } label: {
+                    Color.red.overlay {
+                        Text("subview")
+                    }
+                    .navigationTitle("root")
                 }
+            }
+            .tabItem {
+                Text("1")
+            }
+
+            NavigationStack {
+                NavigationLink {
+                    Text("123")
+                        .navigationTitle("123")
+                } label: {
+                    Color.red.overlay {
+                        Text("subview")
+                    }
+                    .navigationTitle("root")
+                }
+            }
+            .tabItem {
+                Text("2")
+            }
+        }
+    }
+
+    @ViewBuilder
+    var body1: some View {
+        TabBar(selection: $selection) {
+            NavigationLink {
+                Text("123")
+                    .navigationTitle("123")
             } label: {
-                Text("Hide/Show TabBar")
+                Color.red.overlay {
+                    Text("subview")
+                }
+                .navigationTitle("root")
+//                .toolbar {
+//                    ToolbarItemGroup(placement: .bottomBar) {
+//                        HStack {
+//                            Button(action: {}, label: {
+//                                Text("Select All")
+//                            })
+//
+//                            Spacer()
+//                            Button(action: {}, label: {
+//                                Text("Select All")
+//                            })
+//                        }\
+//                    }
+//                }
             }
             .tabItem(for: Item.first)
 
@@ -67,8 +123,8 @@ struct ContentView: View {
             TextWrapper()
                 .tabItem(for: Item.third)
         }
-        .tabBar(style: CustomTabBarStyle())
-        .tabItem(style: CustomTabItemStyle())
+//        .tabBar(style: CustomTabBarStyle())
+//        .tabItem(style: CustomTabItemStyle())
         .onChange(of: selection) { newValue in
             print("selection changed:", newValue)
         }

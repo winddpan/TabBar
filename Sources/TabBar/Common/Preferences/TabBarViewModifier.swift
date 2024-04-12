@@ -29,16 +29,43 @@ struct TabBarViewModifier<TabItem: Tabbable>: ViewModifier {
     let item: TabItem
 
     func body(content: Content) -> some View {
-        Group {
+        GeometryReader { geometry in
             if selectionObject.loadedItems.contains(item) {
-                content
-                    .opacity(item == selectionObject.selection ? 1 : 0)
+                NavigationView {
+                    VStack(spacing: 0) {
+                        content
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                        selectionObject.tabBarStyle.tabBar(with: geometry) {
+                            .init(tabItems)
+                        }
+                    }
+                    .ignoresSafeArea(edges: .bottom)
+                }
+                .opacity(item == selectionObject.selection ? 1 : 0)
             } else {
                 Color.clear
             }
         }
         .environmentObject(selectionObject)
         .preference(key: TabBarPreferenceKey.self, value: [item])
+    }
+
+    private var tabItems: some View {
+        HStack {
+            ForEach(selectionObject.items, id: \.self) { item in
+                selectionObject.tabItemStyle.tabItem(
+                    icon: item.icon,
+                    selectedIcon: item.selectedIcon,
+                    title: item.title,
+                    isSelected: selectionObject.selection == item
+                )
+                .onTapGesture {
+                    selectionObject.selection = item
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
     }
 }
 
